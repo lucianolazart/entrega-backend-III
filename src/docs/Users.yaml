@@ -1,0 +1,231 @@
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        _id:
+          type: string
+          description: Id autogenerado de MongoDB
+          example: "60acc54545c8e82e0475f73a"
+        first_name:
+          type: string
+          description: Nombre del usuario
+          example: "Juan"
+        last_name:
+          type: string
+          description: Apellido del usuario
+          example: "Pérez"
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+          example: "juan.perez@example.com"
+        password:
+          type: string
+          description: Contraseña del usuario (encriptada)
+        role:
+          type: string
+          description: Rol del usuario
+          default: "user"
+          example: "user"
+        pets:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                description: Id de la mascota
+          description: Array de mascotas del usuario
+          example: []
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+          example: "Juan"
+        last_name:
+          type: string
+          description: Apellido del usuario
+          example: "Pérez"
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+          example: "juan.perez@example.com"
+        role:
+          type: string
+          description: Rol del usuario
+          example: "admin"
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        error:
+          type: string
+          example: "Mensaje de error"
+    Success:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        payload:
+          description: Datos de respuesta
+        message:
+          type: string
+          example: "Operación exitosa"
+
+paths:
+  /api/users:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Lista de usuarios obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      payload:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        "500":
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users/{uid}:
+    get:
+      summary: Obtener un usuario por su ID
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          schema:
+            type: string
+          description: ID del usuario a obtener
+          example: "60acc54545c8e82e0475f73a"
+      responses:
+        "200":
+          description: Usuario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      payload:
+                        $ref: '#/components/schemas/User'
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Actualizar un usuario
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          schema:
+            type: string
+          description: ID del usuario a actualizar
+          example: "60acc54545c8e82e0475f73a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        "200":
+          description: Usuario actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "User updated"
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Eliminar un usuario
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          schema:
+            type: string
+          description: ID del usuario a eliminar
+          example: "60acc54545c8e82e0475f73a"
+      responses:
+        "200":
+          description: Usuario eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Success'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "User deleted"
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
